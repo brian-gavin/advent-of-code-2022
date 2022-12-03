@@ -1,11 +1,13 @@
 use std::{env::args, process};
 
-use aoc::one;
+use aoc::*;
 
 fn run(problem: &str, input: Vec<String>) -> Result<impl ToString, String> {
     Ok(match problem {
         "11" => one::solve1(input),
         "12" => one::solve2(input),
+        "21" => two::solve1(input),
+        "22" => two::solve2(input),
         _ => return Err(format!("invalid problem number: {}", problem)),
     })
 }
