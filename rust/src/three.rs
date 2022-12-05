@@ -1,4 +1,4 @@
-use std::{collections::HashSet, hash::Hash};
+use std::collections::HashSet;
 
 fn priority(b: u8) -> u64 {
     if b.is_ascii_lowercase() {

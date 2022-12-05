@@ -1,17 +1,19 @@
-use std::{env::args, process};
+use std::{env::args, fmt::Display, process};
 
 use aoc::*;
 
-fn run(problem: &str, input: Vec<String>) -> Result<impl ToString, String> {
+fn run(problem: &str, input: Vec<String>) -> Result<Box<dyn Display>, String> {
     Ok(match problem {
-        "11" => one::solve1(input),
-        "12" => one::solve2(input),
-        "21" => two::solve1(input),
-        "22" => two::solve2(input),
-        "31" => three::solve1(input),
-        "32" => three::solve2(input),
-        "41" => four::solve1(input),
-        "42" => four::solve2(input),
+        "11" => Box::new(one::solve1(input)),
+        "12" => Box::new(one::solve2(input)),
+        "21" => Box::new(two::solve1(input)),
+        "22" => Box::new(two::solve2(input)),
+        "31" => Box::new(three::solve1(input)),
+        "32" => Box::new(three::solve2(input)),
+        "41" => Box::new(four::solve1(input)),
+        "42" => Box::new(four::solve2(input)),
+        "51" => Box::new(five::solve1(input)),
+        "52" => Box::new(five::solve2(input)),
         _ => return Err(format!("invalid problem number: {}", problem)),
     })
 }
@@ -24,7 +26,7 @@ fn main() {
     };
     let input = aoc::read_input().unwrap();
     match run(problem, input) {
-        Ok(solution) => println!("{}", solution.to_string()),
+        Ok(solution) => println!("{}", solution),
         Err(e) => eprintln!("error: {}", e),
     }
 }
