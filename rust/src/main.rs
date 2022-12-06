@@ -14,6 +14,8 @@ fn run(problem: &str, input: Vec<String>) -> Result<Box<dyn Display>, String> {
         "42" => Box::new(four::solve2(input)),
         "51" => Box::new(five::solve1(input)),
         "52" => Box::new(five::solve2(input)),
+        "61" => Box::new(six::solve1(input)),
+        "62" => Box::new(six::solve2(input)),
         _ => return Err(format!("invalid problem number: {}", problem)),
     })
 }
