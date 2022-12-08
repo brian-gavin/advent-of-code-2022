@@ -116,12 +116,12 @@ fn normalize(parent: &str, dir: &str) -> String {
 
 fn sizes(fs: BTreeMap<String, DirView>) -> BTreeMap<String, usize> {
     let mut sizes = BTreeMap::new();
-    fs.iter().rev().for_each(|(dir, view)| {
+    fs.into_iter().rev().for_each(|(dir, view)| {
         let size = view
             .entries
             .iter()
             .map(|e| match e {
-                DirEntry::Dir(d) => *sizes.get(&normalize(dir, d)).unwrap(),
+                DirEntry::Dir(d) => *sizes.get(&normalize(&dir, d)).unwrap(),
                 DirEntry::File(File { size, .. }) => *size,
             })
             .sum();

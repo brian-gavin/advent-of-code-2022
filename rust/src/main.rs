@@ -1,26 +1,29 @@
 use std::{env::args, fmt::Display, process};
 
-use aoc::*;
-
-fn run(problem: &str, input: Vec<String>) -> Result<Box<dyn Display>, String> {
-    Ok(match problem {
-        "11" => Box::new(one::solve1(input)),
-        "12" => Box::new(one::solve2(input)),
-        "21" => Box::new(two::solve1(input)),
-        "22" => Box::new(two::solve2(input)),
-        "31" => Box::new(three::solve1(input)),
-        "32" => Box::new(three::solve2(input)),
-        "41" => Box::new(four::solve1(input)),
-        "42" => Box::new(four::solve2(input)),
-        "51" => Box::new(five::solve1(input)),
-        "52" => Box::new(five::solve2(input)),
-        "61" => Box::new(six::solve1(input)),
-        "62" => Box::new(six::solve2(input)),
-        "71" => Box::new(seven::solve1(input)),
-        "72" => Box::new(seven::solve2(input)),
-        _ => return Err(format!("invalid problem number: {}", problem)),
-    })
+macro_rules! generate_runner {
+    ($(($n:literal, $m:ident)),+) => {
+        fn run(problem: &str, input: Vec<String>) -> Result<Box<dyn Display>, String> {
+            match problem {
+                $(
+                    concat!($n,1) => Ok(Box::new(aoc::$m::solve1(input))),
+                    concat!($n,2) => Ok(Box::new(aoc::$m::solve2(input))),
+                )+
+                _ => Err(format!("invalid problem number: {}", problem)),
+            }
+        }
+    };
 }
+
+generate_runner!(
+    (1, one),
+    (2, two),
+    (3, three),
+    (4, four),
+    (5, five),
+    (6, six),
+    (7, seven),
+    (8, eight)
+);
 
 fn main() {
     let args: Vec<_> = args().collect();
