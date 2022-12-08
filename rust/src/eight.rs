@@ -32,10 +32,11 @@ impl<'a> TreeRef<'a> {
     fn visible(&self) -> bool {
         let (mut left, mut right, mut top, mut bottom) = self.directions();
         let TreeRef { forest, i, j } = *self;
-        left.all(|(i2, j2)| forest[i2][j2] < forest[i][j])
-            || right.all(|(i2, j2)| forest[i2][j2] < forest[i][j])
-            || top.all(|(i2, j2)| forest[i2][j2] < forest[i][j])
-            || bottom.all(|(i2, j2)| forest[i2][j2] < forest[i][j])
+        let less_height = |(i2, j2): (usize, usize)| forest[i2][j2] < forest[i][j];
+        left.all(less_height)
+            || right.all(less_height)
+            || top.all(less_height)
+            || bottom.all(less_height)
     }
 
     fn count_visible_trees(&self, direction: impl Iterator<Item = (usize, usize)>) -> u64 {
