@@ -1,42 +1,33 @@
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Copy)]
-enum Command {
-    Up(usize),
-    Down(usize),
-    Left(usize),
-    Right(usize),
+enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
-fn parse_commands(input: impl Iterator<Item = String>) -> impl Iterator<Item = Command> {
-    use Command::*;
-    input.map(|s| {
+fn parse_commands(input: impl Iterator<Item = String>) -> impl Iterator<Item = Direction> {
+    use Direction::*;
+    input.flat_map(|s| {
         let (c, n) = s.split_once(' ').unwrap();
-        match c {
-            "U" => Up(n.parse().unwrap()),
-            "D" => Down(n.parse().unwrap()),
-            "L" => Left(n.parse().unwrap()),
-            "R" => Right(n.parse().unwrap()),
-            _ => unreachable!(),
-        }
+        let (n, c) = (
+            n.parse().unwrap(),
+            match c {
+                "U" => Up,
+                "D" => Down,
+                "L" => Left,
+                "R" => Right,
+                _ => unreachable!(),
+            },
+        );
+        (0..n).map(move |_| c)
     })
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 struct Point(isize, isize);
-
-fn move_up(Point(x, y): Point) -> Point {
-    Point(x, y + 1)
-}
-fn move_down(Point(x, y): Point) -> Point {
-    Point(x, y - 1)
-}
-fn move_left(Point(x, y): Point) -> Point {
-    Point(x - 1, y)
-}
-fn move_right(Point(x, y): Point) -> Point {
-    Point(x + 1, y)
-}
 
 fn move_tail(h: &Point, t: Point, part2: bool) -> Point {
     let (Point(hx, hy), Point(tx, ty)) = (h, t);
@@ -65,45 +56,35 @@ fn move_tail(h: &Point, t: Point, part2: bool) -> Point {
     }
 }
 
-fn unwrap_cmd(cmd: Command) -> (fn(Point) -> Point, usize) {
+fn move_head(cmd: Direction, h: Point) -> Point {
+    let Point(x, y) = h;
     match cmd {
-        Command::Up(n) => (move_up, n),
-        Command::Down(n) => (move_down, n),
-        Command::Left(n) => (move_left, n),
-        Command::Right(n) => (move_right, n),
+        Direction::Up => Point(x, y + 1),
+        Direction::Down => Point(x, y - 1),
+        Direction::Left => Point(x - 1, y),
+        Direction::Right => Point(x + 1, y),
     }
 }
 
-pub fn solve1(input: Vec<String>) -> usize {
-    let (visited, _, _) = parse_commands(input.into_iter()).fold(
-        (HashSet::new(), Point::default(), Point::default()),
-        |(mut visited, mut h, mut t), cmd| {
-            let (move_head, n) = unwrap_cmd(cmd);
-            for _ in 0..n {
-                h = move_head(h);
-                t = move_tail(&h, t, false);
-                visited.insert(t);
+fn solve<const N: usize>(input: impl Iterator<Item = String>) -> usize {
+    let (visited, ..) = parse_commands(input).fold(
+        (HashSet::new(), [Point::default(); N]),
+        |(mut visited, mut knots), dir| {
+            knots[0] = move_head(dir, knots[0]);
+            for i in 1..N {
+                knots[i] = move_tail(&knots[i - 1], knots[i], N == 10);
             }
-            (visited, h, t)
-        },
-    );
-    visited.len()
-}
-
-pub fn solve2(input: Vec<String>) -> usize {
-    let (visited, ..) = parse_commands(input.into_iter()).fold(
-        (HashSet::new(), [Point::default(); 10]),
-        |(mut visited, mut knots), cmd| {
-            let (move_head, n) = unwrap_cmd(cmd);
-            for _ in 0..n {
-                knots[0] = move_head(knots[0]);
-                for i in 1..10 {
-                    knots[i] = move_tail(&knots[i - 1], knots[i], true);
-                }
-                visited.insert(knots[9]);
-            }
+            visited.insert(knots[N - 1]);
             (visited, knots)
         },
     );
     visited.len()
+}
+
+pub fn solve1(input: Vec<String>) -> usize {
+    solve::<2>(input.into_iter())
+}
+
+pub fn solve2(input: Vec<String>) -> usize {
+    solve::<10>(input.into_iter())
 }
