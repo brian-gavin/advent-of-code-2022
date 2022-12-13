@@ -25,7 +25,8 @@ generate_runner!(
     (8, eight),
     (9, nine),
     (10, ten),
-    (11, eleven)
+    (11, eleven),
+    (13, thirteen)
 );
 
 fn main() {
